@@ -6,15 +6,22 @@ import { Copilot } from "./components/Copilot";
 import { OpsPanel } from "./components/OpsPanel";
 import { PlanPage } from "./components/PlanPage";
 import { TripView } from "./components/TripView";
+import { type AppView, Landing } from "./landing/Landing";
 
-type Tab = "plan" | "trip" | "copilot" | "ops";
-const TABS: { id: Tab; label: string }[] = [
+type View = "home" | AppView;
+const TABS: { id: AppView; label: string }[] = [
   { id: "plan", label: "Plan" },
   { id: "trip", label: "My trip" },
   { id: "copilot", label: "Copilot" },
   { id: "ops", label: "Ops" },
 ];
 const STORE_KEY = "kognisync.trippass";
+
+/** "#/plan" style routes; anything else (including "#capabilities" anchors) is the landing page. */
+export function viewFromHash(hash: string): View {
+  const id = hash.startsWith("#/") ? hash.slice(2) : "";
+  return TABS.some((t) => t.id === id) ? (id as AppView) : "home";
+}
 
 function readStored(): string | null {
   try {
@@ -25,19 +32,31 @@ function readStored(): string | null {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>("plan");
+  const [view, setView] = useState<View>(() => viewFromHash(window.location.hash));
   const [booking, setBooking] = useState<Journey | null>(null);
   const [trippass, setTrippass] = useState<TripPass | null>(null);
+
+  useEffect(() => {
+    const onHash = () => setView(viewFromHash(window.location.hash));
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
 
   useEffect(() => {
     const id = readStored();
     if (id) api.trippass(id).then(setTrippass, () => undefined);
   }, []);
 
+  function go(next: View) {
+    window.location.hash = next === "home" ? "" : `/${next}`;
+    setView(next);
+    window.scrollTo({ top: 0 });
+  }
+
   function booked(tp: TripPass) {
     setTrippass(tp);
     setBooking(null);
-    setTab("trip");
+    go("trip");
     try {
       localStorage.setItem(STORE_KEY, tp.id);
     } catch {
@@ -45,20 +64,24 @@ export default function App() {
     }
   }
 
+  if (view === "home") return <Landing onOpen={go} />;
+
   return (
     <main className="app">
       <header className="top">
         <div>
-          <h1>KogniSync</h1>
+          <button type="button" className="brand" onClick={() => go("home")} aria-label="KogniSync home">
+            KOGNISYNC
+          </button>
           <p className="tagline">Door-to-door journeys across flight, train, bus, cab, Rapido, metro and walk.</p>
         </div>
         <nav className="tabs" aria-label="Sections">
           {TABS.map((t) => (
             <button
               key={t.id}
-              className={`tab ${tab === t.id ? "tab--active" : ""}`}
-              aria-current={tab === t.id ? "page" : undefined}
-              onClick={() => setTab(t.id)}
+              className={`tab ${view === t.id ? "tab--active" : ""}`}
+              aria-current={view === t.id ? "page" : undefined}
+              onClick={() => go(t.id)}
             >
               {t.label}
             </button>
@@ -66,15 +89,15 @@ export default function App() {
         </nav>
       </header>
 
-      {tab === "plan" && <PlanPage onBook={setBooking} />}
-      {tab === "trip" &&
+      {view === "plan" && <PlanPage onBook={setBooking} />}
+      {view === "trip" &&
         (trippass ? (
           <TripView trippass={trippass} onBook={setBooking} />
         ) : (
           <p className="card muted">No trip booked yet. Plan one and book it to get a TripPass.</p>
         ))}
-      {tab === "copilot" && <Copilot trippassId={trippass?.id} onReviewJourney={setBooking} />}
-      {tab === "ops" && <OpsPanel />}
+      {view === "copilot" && <Copilot trippassId={trippass?.id} onReviewJourney={setBooking} />}
+      {view === "ops" && <OpsPanel />}
 
       {booking && <BookingDialog journey={booking} onBooked={booked} onClose={() => setBooking(null)} />}
     </main>

@@ -82,6 +82,10 @@ export const api = {
   // 503 still carries a useful body listing which dependency is down.
   readiness: () => request<Readiness>("/api/v1/health/ready", {}, [503]),
   places: () => request<{ places: string[] }>("/api/v1/places"),
+  hubs: () =>
+    request<{ hubs: { key: string; name: string; lat: number; lon: number; has_metro: boolean }[] }>(
+      "/api/v1/hubs",
+    ),
 
   search: (req: SearchRequest) => post<SearchResponse>("/api/v1/journeys/search", req),
   journey: (id: string) => request<Journey>(`/api/v1/journeys/${id}`),

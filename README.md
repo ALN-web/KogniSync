@@ -22,6 +22,12 @@ Spec: [docs/buildathon/](docs/buildathon/)
   explicit consents, one signed TripPass with a QR code.
 - **Protect:** disruptions cascade through later legs (missed connections, deadline misses);
   recovery options are proposed, never booked automatically.
+- **Landing page:** a dark, brushed-metal landing page with a 3D hero (metal globe, toothed
+  steel ring, glowing routes over India) and a 3D map pin, then links into the app
+  (`#/plan`, `#/trip`, `#/copilot`, `#/ops`).
+- **See it in 3D:** a WebGL globe (three.js) shows the 14 hubs and the selected door-to-door
+  route: flights arc above the surface, ground legs follow it, a traveler dot moves along the
+  trip, and disrupted legs pulse red. It falls back to a text description without WebGL.
 - **Converse:** a Gemini copilot with function calling and a price-grounding check; voice in
   Indian languages and photo reading (tickets, PNR screenshots, departure boards) via Gemini.
   Without an API key it falls back to a rule-based planner.
@@ -35,6 +41,8 @@ backend/    Python 3.13 · FastAPI · uv          API at /api/v1 (docs at /api/d
   app/services    orchestrator, optimizer, provenance, booking saga, disruptions, stores
   app/ai          Gemini adapter, copilot + tools, intent parsing, Omni voice/vision, reliability
 frontend/   React · TypeScript · Vite · Vitest   web app
+  src/globe       3D journey globe (three.js, lazily loaded) and its pure geometry helpers
+  src/landing     landing page, its two 3D scenes and card illustrations
 infra/      Terraform + Cloud Build for Google Cloud (asia-south1)
 docs/       roadmap, deployment guide, buildathon spec
 scripts/    one-command dev and test scripts

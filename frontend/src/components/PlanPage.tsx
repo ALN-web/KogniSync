@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "../api/client";
 import type { Journey, SearchRequest, SearchResponse } from "../api/types";
 import { JourneyCard } from "./JourneyCard";
+import { JourneyGlobe } from "./JourneyGlobe";
 import { SearchForm } from "./SearchForm";
 
 const REASONS: Record<string, string> = {
@@ -15,12 +16,15 @@ export function PlanPage({ onBook }: { onBook: (j: Journey) => void }) {
   const [result, setResult] = useState<SearchResponse | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   async function search(req: SearchRequest) {
     setBusy(true);
     setError(null);
     try {
-      setResult(await api.search(req));
+      const res = await api.search(req);
+      setResult(res);
+      setSelectedId((res.journeys.find((j) => j.labels.includes("recommended")) ?? res.journeys[0])?.id ?? null);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setResult(null);
@@ -37,6 +41,7 @@ export function PlanPage({ onBook }: { onBook: (j: Journey) => void }) {
 
   return (
     <section className="plan">
+      <JourneyGlobe journey={result?.journeys.find((j) => j.id === selectedId) ?? null} />
       <SearchForm onSearch={search} busy={busy} />
       {error && (
         <p role="alert" className="error">
@@ -59,7 +64,16 @@ export function PlanPage({ onBook }: { onBook: (j: Journey) => void }) {
             </p>
           ))}
           {result.journeys.map((j) => (
-            <JourneyCard key={j.id} journey={j} onBook={onBook} />
+            <JourneyCard
+              key={j.id}
+              journey={j}
+              onBook={onBook}
+              selected={j.id === selectedId}
+              onSelect={(sel) => {
+                setSelectedId(sel.id);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            />
           ))}
         </div>
       )}

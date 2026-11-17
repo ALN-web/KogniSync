@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.api.v1.deps import ContainerDep
-from app.data.cities import UnknownPlaceError, known_place_names
+from app.data.cities import CITIES, UnknownPlaceError, known_place_names
 from app.domain.models import Journey, SearchRequest, SearchResponse
 from app.services import provenance
 
@@ -31,3 +31,20 @@ async def get_journey(journey_id: str, c: ContainerDep) -> Journey:
 @router.get("/places")
 async def list_places() -> dict[str, list[str]]:
     return {"places": known_place_names()}
+
+
+@router.get("/hubs")
+async def list_hubs() -> dict[str, list[dict]]:
+    """The 14 modeled metro hubs, for maps and the 3D globe."""
+    return {
+        "hubs": [
+            {
+                "key": c.key,
+                "name": c.name,
+                "lat": c.center[0],
+                "lon": c.center[1],
+                "has_metro": c.metro is not None,
+            }
+            for c in CITIES.values()
+        ]
+    }

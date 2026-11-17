@@ -16,6 +16,16 @@ bookings.
 | M7 | Gemini Omni | Voice (audio → transcript, language, intent → reply in that language, spoken by the browser) and vision (tickets, boarding passes, PNR SMS, departure boards) | Done; needs `GEMINI_API_KEY`; browser speech fallback for voice |
 | M8 | Google Cloud deploy | Dockerfile, Terraform (Cloud Run, Cloud SQL, Memorystore, Secret Manager, Artifact Registry, VPC), Cloud Build, Firebase Hosting, [DEPLOY.md](DEPLOY.md) | Prepared, not applied or validated |
 
+## Extras
+
+- **3D journey globe** (Plan and My trip tabs). Built after studying Flight Viz
+  (flight-viz.com), a live WebGL flight globe. REA (`rea-agents analyze-javascript-application`)
+  was run on its public JS bundle and showed raw WebGL driven from Rust/WASM, instanced draw
+  calls for thousands of markers, and one `requestAnimationFrame` loop. KogniSync's globe is an
+  independent three.js implementation using the same ideas: land drawn as one point cloud from
+  public-domain Natural Earth data, hubs as one instanced mesh, routes built once, and only the
+  camera, traveler and labels updated per frame. No code or assets were copied.
+
 ## Next
 
 - Real providers: Google Routes / Places for local legs and geocoding, GTFS-RT feeds, carrier

@@ -4,7 +4,7 @@
   --muted: #5f6670;
   --card: #ffffff;
   --border: #e3e6ea;
-  --accent: #1a73e8;
+  --accent: #c2410c; /* 5.2:1 on white */
   --accent-fg: #ffffff;
   --ok: #188038;
   --warn: #b06000;
@@ -21,7 +21,7 @@
   --m-rapido: #f9ab00;
   --m-metro: #188038;
   --m-walk: #80868b;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Inter Tight", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: var(--fg);
   background: var(--bg);
   line-height: 1.45;
@@ -34,8 +34,8 @@
     --muted: #9aa0a6;
     --card: #1c1f23;
     --border: #2e3237;
-    --accent: #8ab4f8;
-    --accent-fg: #0b1a33;
+    --accent: #ff5a2c;
+    --accent-fg: #0b0c0e; /* dark text on orange, as in the design */
     --ok: #81c995;
     --warn: #fdd663;
     --warn-bg: #3a3218;
@@ -513,4 +513,115 @@ input[type="checkbox"] {
 }
 .finding--warning strong {
   color: var(--warn);
+}
+
+/* ---------- 3D journey globe ---------- */
+.globe {
+  position: relative;
+  margin: 0 0 12px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 40%, #0f1d3d 0%, #070b16 70%);
+  border: 1px solid #1c2740;
+  touch-action: none;
+}
+.globe__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+.globe__canvas:active {
+  cursor: grabbing;
+}
+.globe__labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.globe__label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: -24px 0 0 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  color: #c9d6f0;
+  text-shadow: 0 1px 3px #000;
+}
+.globe__label--endpoint {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgb(10 18 38 / 80%);
+  border: 1px solid #2b3c63;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: -30px;
+}
+.globe__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: #9fb0d0;
+}
+.globe__legend {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 12px;
+  color: #dbe4f5;
+  pointer-events: none;
+}
+.globe__legend .muted {
+  color: #8a9ab8;
+  margin-left: auto;
+}
+.globe__legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: -1px;
+}
+.globe--fallback {
+  min-height: 80px;
+  display: grid;
+  place-items: center;
+}
+.journey--selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+@media (max-width: 520px) {
+  .globe {
+    height: 300px !important;
+  }
+  .globe__legend .muted {
+    display: none;
+  }
+}
+
+.globe__legend-alert {
+  color: #ff8a80;
+  font-weight: 600;
+}
+
+.brand {
+  font: 500 22px "Inter Tight", system-ui, sans-serif;
+  letter-spacing: 0.3em;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0 0 4px;
+  color: var(--fg);
+  cursor: pointer;
 }

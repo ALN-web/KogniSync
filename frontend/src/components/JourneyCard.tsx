@@ -7,12 +7,14 @@ interface Props {
   journey: Journey;
   onBook?: (j: Journey) => void;
   bookLabel?: string;
+  selected?: boolean;
+  onSelect?: (j: Journey) => void;
 }
 
-export function JourneyCard({ journey: j, onBook, bookLabel = "Book" }: Props) {
+export function JourneyCard({ journey: j, onBook, bookLabel = "Book", selected, onSelect }: Props) {
   const [open, setOpen] = useState(j.labels.includes("recommended"));
   return (
-    <article className="card journey" aria-label={`Journey ${j.id}`}>
+    <article className={`card journey ${selected ? "journey--selected" : ""}`} aria-label={`Journey ${j.id}`}>
       <div className="journey__labels">
         {j.labels.map((l) => (
           <span key={l} className={`chip chip--${l}`}>
@@ -58,6 +60,16 @@ export function JourneyCard({ journey: j, onBook, bookLabel = "Book" }: Props) {
         <button type="button" className="btn btn--ghost" onClick={() => setOpen(!open)} aria-expanded={open}>
           {open ? "Hide details" : "Details"}
         </button>
+        {onSelect && (
+          <button
+            type="button"
+            className="btn btn--ghost"
+            aria-pressed={selected}
+            onClick={() => onSelect(j)}
+          >
+            {selected ? "On globe" : "Show on globe"}
+          </button>
+        )}
         {onBook && (
           <button type="button" className="btn" onClick={() => onBook(j)}>
             {bookLabel}

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../api/client";
 import type { DisruptionCreate, Impact, Journey, Recovery, TripPass } from "../api/types";
 import { MODE_TEXT, formatDuration, formatInr, formatTime } from "../lib/format";
 import { JourneyCard } from "./JourneyCard";
+import { JourneyGlobe } from "./JourneyGlobe";
 
 interface Props {
   trippass: TripPass;
@@ -66,9 +67,14 @@ export function TripView({ trippass: tp, onBook }: Props) {
   }
 
   const statusOf = (legId: string) => impact?.legs.find((l) => l.leg_id === legId);
+  const statuses = useMemo(
+    () => Object.fromEntries((impact?.legs ?? []).map((l) => [l.leg_id, l.status])),
+    [impact],
+  );
 
   return (
     <section className="trip">
+      <JourneyGlobe journey={tp.journey} statuses={statuses} height={340} />
       <div className="card trippass">
         <div>
           <p className="muted">TripPass</p>
