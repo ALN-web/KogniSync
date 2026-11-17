@@ -1,0 +1,9 @@
+project_id = "your-gcp-project-id"
+region     = "asia-south1"
+
+# Web origins allowed to call the API directly (Firebase Hosting uses same-origin /api rewrites).
+cors_origins = "https://your-gcp-project-id.web.app"
+
+# Demo settings: one warm instance, simulation on for judges. Set both back for production.
+min_instances     = 1
+enable_simulation = true

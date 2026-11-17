@@ -1,0 +1,52 @@
+# CI/CD: test everything, build the API image, push to Artifact Registry, deploy to Cloud Run.
+# Trigger from the repo root:  gcloud builds submit --config infra/cloudbuild.yaml .
+substitutions:
+  _REGION: asia-south1
+  _SERVICE: kognisync-api
+  _REPO: kognisync
+
+steps:
+  - id: backend-tests
+    name: python:3.13-slim
+    dir: backend
+    entrypoint: sh
+    args:
+      - -c
+      - pip install --quiet uv==0.12.10 && uv sync --frozen && uv run ruff check . && uv run pytest
+
+  - id: frontend-tests
+    name: node:22
+    dir: frontend
+    entrypoint: sh
+    args: [-c, "npm ci && npm run typecheck && npm test && npm run build"]
+    waitFor: ["-"]
+
+  - id: build-image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/api:$BUILD_ID
+      - backend
+    waitFor: [backend-tests]
+
+  - id: push-image
+    name: gcr.io/cloud-builders/docker
+    args: [push, "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/api:$BUILD_ID"]
+
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/api:$BUILD_ID
+      - --region=${_REGION}
+    waitFor: [push-image, frontend-tests]
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/api:$BUILD_ID
+
+options:
+  logging: CLOUD_LOGGING_ONLY
