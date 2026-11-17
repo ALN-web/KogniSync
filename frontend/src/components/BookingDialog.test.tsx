@@ -62,3 +62,15 @@ describe("BookingDialog", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Nothing was held");
   });
 });
+
+describe("BookingDialog keyboard", () => {
+  it("closes on Escape and shows the step indicator", () => {
+    mockApi({});
+    const onClose = vi.fn();
+    render(<BookingDialog journey={journey()} onBooked={vi.fn()} onClose={onClose} />);
+    expect(screen.getByRole("list", { name: "Booking steps" })).toBeInTheDocument();
+    expect(screen.getByText("Review")).toHaveAttribute("aria-current", "step");
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+    return waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+});

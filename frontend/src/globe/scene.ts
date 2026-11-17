@@ -221,6 +221,9 @@ export function createGlobe(canvas: HTMLCanvasElement, opts: GlobeOptions): Glob
     const paths = journeyPaths(journey, statuses);
     const all = paths.flatMap((p) => p.points);
     const f = framing(all);
+    // Narrow (portrait) panels see less horizontally: pull back so the route still fits.
+    const fit = Math.max(1, 1.3 / Math.max(camera.aspect, 0.4));
+    f.distance = 1 + (f.distance - 1) * fit;
     // Thin tubes when zoomed far out on a long trip keep local legs from looking like blobs.
     const small = f.distance < 1.3;
     paths.forEach((p) => route.add(tube(p, small)));

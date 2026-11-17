@@ -44,7 +44,7 @@ export function HealthPanel() {
 
   const { liveness, readiness } = state;
   return (
-    <section className="health" aria-label="System health">
+    <section className="card health" aria-label="System health">
       <p className={`health__summary health--${readiness.status}`}>
         API {liveness.version} ({liveness.environment}): <strong>{readiness.status}</strong>
       </p>

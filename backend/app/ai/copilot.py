@@ -113,7 +113,8 @@ def template_answer(journeys: list[Journey], hints: list[str], origin: str, dest
     best = next((j for j in journeys if "recommended" in j.labels), journeys[0])
     s = journey_summary(best)
     lines = [
-        f"I found {len(journeys)} options from {origin} to {dest} (demo data).",
+        f"I found {len(journeys)} option{'' if len(journeys) == 1 else 's'} "
+        f"from {origin} to {dest} (demo data).",
         f"Recommended: {s['route']}. Leave {s['depart']}, arrive {s['arrive']} "
         f"({s['duration']}), {s['cost_display']} ({s['cost_provenance']}), "
         f"about {s['carbon_kg']} kg CO2.",
